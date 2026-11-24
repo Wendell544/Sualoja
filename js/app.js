@@ -116,23 +116,36 @@ const pf = Prefs.get();
 if (pf.theme) document.documentElement.dataset.theme = pf.theme;
 document.querySelectorAll('[data-i]').forEach((e) => (e.innerHTML = ic(e.dataset.i, +e.dataset.s || 20)));
 
+// Failsafe: se por algum motivo render() não rodar em 6s, libera a página.
+setTimeout(() => document.documentElement.classList.remove('is-loading'), 6000);
+
 (async () => {
-  await loadFromSupabase();
-  const session = await Auth.getSession();
-  if (session) {
-    const user = session.user;
-    if (user?.app_metadata?.role === 'admin') {
-      A.ok = true;
+  try {
+    await loadFromSupabase();
+    const session = await Auth.getSession();
+    if (session) {
+      const user = session.user;
+      if (user?.app_metadata?.role === 'admin') {
+        A.ok = true;
+      }
     }
+    try { await IMG.migrateLegacy(); } catch (e) {}
+
+    S.cat = pf.cat || 'Todos';
+    S.srt = pf.srt || 'feat';
+    $('so').value = S.srt;
+
+    try {
+      render();
+    } finally {
+      document.documentElement.classList.remove('is-loading');
+    }
+    setTimeout(openFromHash, 60);
+  } catch (e) {
+    console.error('Falha ao iniciar a loja:', e);
+    try { render(); } catch (_) {}
+    document.documentElement.classList.remove('is-loading');
   }
-  try { await IMG.migrateLegacy(); } catch (e) {}
-
-  S.cat = pf.cat || 'Todos';
-  S.srt = pf.srt || 'feat';
-  $('so').value = S.srt;
-
-  render();
-  setTimeout(openFromHash, 60);
 })();
 
 try {
