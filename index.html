@@ -21,9 +21,39 @@
 <meta name="twitter:description" content="Selecionamos o melhor para você. Escolha o que ama e finalize no WhatsApp.">
 <meta name="twitter:image" content="https://i.postimg.cc/1zqYQKWd/6E2CC11B-6BFA-4C95-819D-A4901542DA1A.png">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='%2309090b'/%3E%3Cpath%20d='M7%204h4l3%2010%203-10h4l-5%2016h-4z'%20fill='%23cda353'/%3E%3C/svg%3E">
+<!--
+  Pré-carrega o LOGO CORRETO (claro ou escuro) baseado na preferência real do usuário.
+  O logo é carregado via CSS background-image (theme-dependent), então um <link rel="preload">
+  estático gerava warning quando o tema escuro estava ativo. Este script inline resolve
+  o tema E injeta o preload correto antes do CSS ser parseado — zero warnings e sem flash
+  de tema errado (bônus de FOUC).
+-->
+<script>
+(function () {
+  try {
+    var head = document.head || document.getElementsByTagName('head')[0];
+    if (!head) return;
+    var prefs = {};
+    try { prefs = JSON.parse(localStorage.getItem('loja_prefs') || '{}') || {}; } catch (e) {}
+    var saved = prefs && prefs.theme;
+    if (saved === 'dark' || saved === 'light') {
+      document.documentElement.setAttribute('data-theme', saved);
+    }
+    var isDark = saved === 'dark' || (saved !== 'light' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    var url = isDark
+      ? 'https://i.postimg.cc/kgDpjCWq/FDE807DA-AA8B-43A4-A74F-AEDCA7A4E627.png'
+      : 'https://i.postimg.cc/1zqYQKWd/6E2CC11B-6BFA-4C95-819D-A4901542DA1A.png';
+    var l = document.createElement('link');
+    l.rel = 'preload';
+    l.as = 'image';
+    l.href = url;
+    l.setAttribute('fetchpriority', 'high');
+    head.appendChild(l);
+  } catch (e) {}
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="image" href="https://i.postimg.cc/1zqYQKWd/6E2CC11B-6BFA-4C95-819D-A4901542DA1A.png" fetchpriority="high">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="css/style.css?v=17">
 <script type="application/ld+json">
