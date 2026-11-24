@@ -1,4 +1,4 @@
-const V = 11, PFX = 'sua loja_', KEY = {
+const V = 12, PFX = 'loja_', KEY = {
   prod: PFX + 'products',
   cart: PFX + 'cart',
   ads: PFX + 'ads',
@@ -23,17 +23,17 @@ const GH_OWNER = 'Wendell544';
 const GH_REPO = 'Sualoja';
 
 const WAD = '5583996006884';
-const CATS0 = ['Masculino', 'Feminino', 'Infantil', 'Calçados', 'Acessórios'];
+const CATS0 = ['Novidades', 'Promoções', 'Destaques', 'Mais Vendidos', 'Exclusivos'];
 
 const SET0 = {
-  kick: 'São Bento · Paraíba',
-  title: 'O look perfeito você encontra aqui',
-  text: 'Moda masculina, feminina e infantil com as melhores tendências. Escolha o que ama e finalize no WhatsApp.',
+  kick: 'Qualidade que você sente',
+  title: 'O melhor para você está aqui',
+  text: 'Selecionamos produtos de qualidade para o seu dia a dia. Escolha o que ama e finalize no WhatsApp.',
   about: '',
   wa: WAD,
   email: '',
-  addr: 'São Bento – PB',
-  ig: 'sua loja',
+  addr: 'Brasil',
+  ig: 'sualoja',
   fb: '',
   sec: 6,
   page: 12,
@@ -120,18 +120,18 @@ const art = (h) =>
       h +
       ',20%,25%)"/><stop offset="1" stop-color="hsl(' +
       h +
-      ',15%,8%)"/></radialGradient></defs><rect width="400" height="400" fill="url(#g)"/><g fill="none" stroke="#cda353" stroke-width="3" stroke-linejoin="round"><path d="M140 120h120l20 80-30 120h-100l-30-120z"/><path d="M160 120c0 20 20 30 40 30s40-10 40-30"/></g><text x="200" y="365" text-anchor="middle" font-family="Georgia,serif" font-size="20" letter-spacing="6" fill="#cda353" opacity=".7">sua loja</text></svg>',
+      ',15%,8%)"/></radialGradient></defs><rect width="400" height="400" fill="url(#g)"/><g fill="none" stroke="#cda353" stroke-width="3" stroke-linejoin="round"><rect x="140" y="130" width="120" height="100" rx="8"/><circle cx="175" cy="165" r="12"/><path d="M145 225l40-35 30 25 20-15 30 25"/></g><text x="200" y="365" text-anchor="middle" font-family="Georgia,serif" font-size="20" letter-spacing="6" fill="#cda353" opacity=".7">LOJA</text></svg>',
   );
 
 const seed = () => [
-  ['Camisa Polo Slim', 'Masculino', 129.9, 99.9, '3x sem juros', 'Camisa polo em algodão premium, caimento perfeito.', 1, 200],
-  ['Vestido Midi Elegance', 'Feminino', 189.9, 0, '4x sem juros', 'Vestido midi fluido com caimento impecável.', 1, 330],
-  ['Conjunto Infantil Verão', 'Infantil', 89.9, 0, '2x sem juros', 'Conjunto infantil confortável e fresco.', 0, 45],
-  ['Calça Cargo Moderna', 'Masculino', 159.9, 0, '3x sem juros', 'Calça cargo resistente e cheia de estilo.', 0, 110],
-  ['Bolsa Transversal', 'Acessórios', 119.9, 99.9, '2x sem juros', 'Bolsa transversal em couro sintético.', 0, 25],
-  ['Tênis Casual Urban', 'Calçados', 229.9, 0, '5x sem juros', 'Tênis casual super confortável para o dia a dia.', 1, 0],
-  ['Blusa Cropped Trend', 'Feminino', 79.9, 0, '2x sem juros', 'Blusa cropped canelada, tendência do momento.', 0, 300],
-  ['Moletom Oversized', 'Masculino', 149.9, 0, '3x sem juros', 'Moletom oversized ultra macio.', 0, 250]
+  ['Produto Especial', 'Novidades', 129.9, 99.9, '3x sem juros', 'Item selecionado com carinho para você.', 1, 200],
+  ['Item Premium', 'Destaques', 189.9, 0, '4x sem juros', 'Qualidade superior em cada detalhe.', 1, 330],
+  ['Kit Completo', 'Mais Vendidos', 249.9, 219.9, '5x sem juros', 'Conjunto completo com o melhor custo-benefício.', 0, 45],
+  ['Edição Limitada', 'Exclusivos', 349.9, 0, '6x sem juros', 'Peça exclusiva, poucas unidades disponíveis.', 0, 110],
+  ['Oferta do Dia', 'Promoções', 89.9, 69.9, '2x sem juros', 'Aproveite o preço especial por tempo limitado.', 0, 25],
+  ['Mais Vendido', 'Mais Vendidos', 159.9, 0, '4x sem juros', 'O favorito dos nossos clientes.', 1, 0],
+  ['Novidade da Semana', 'Novidades', 199.9, 0, '4x sem juros', 'Chegou recentemente em nossa loja.', 0, 300],
+  ['Combinação Perfeita', 'Destaques', 79.9, 0, '2x sem juros', 'Combinação que agrada todos os estilos.', 0, 250]
 ].map((a, i) => ({
   id: i + 1,
   title: a[0],
@@ -151,7 +151,7 @@ const ads0 = () => [
     id: 1,
     on: true,
     title: 'Atendimento VIP',
-    text: 'Monte seu look e finalize com atendimento direto da loja.',
+    text: 'Fale com nossa equipe e finalize seu pedido pelo WhatsApp.',
     btn: 'Chamar no WhatsApp',
     link: '',
     img: null
@@ -160,7 +160,7 @@ const ads0 = () => [
     id: 2,
     on: true,
     title: 'Novidades da Semana',
-    text: 'As últimas tendências em moda masculina e feminina.',
+    text: 'Confira os últimos lançamentos da nossa loja.',
     btn: 'Ver Coleção',
     link: '',
     img: null
