@@ -129,14 +129,14 @@ alter publication supabase_realtime add table public.ads;
 alter publication supabase_realtime add table public.categories;
 alter publication supabase_realtime add table public.settings;
 
--- Categorias padrão (moda)
+-- Categorias padrão (neutras — servem para qualquer nicho)
 insert into public.categories (name, sort_order)
 values
-  ('Masculino', 0),
-  ('Feminino', 1),
-  ('Infantil', 2),
-  ('Calçados', 3),
-  ('Acessórios', 4)
+  ('Novidades', 0),
+  ('Promoções', 1),
+  ('Destaques', 2),
+  ('Mais Vendidos', 3),
+  ('Exclusivos', 4)
 on conflict (name) do nothing;
 
 insert into public.settings (id, data)
