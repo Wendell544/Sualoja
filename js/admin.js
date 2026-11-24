@@ -53,7 +53,7 @@ const SF = [
 ];
 
 const SH = [
-  ['feat', 'Looks em destaque'],
+  ['feat', 'Destaques'],
   ['best', 'Mais vendidos'],
   ['news', 'Lançamentos'],
   ['cats', 'Categorias'],
@@ -80,7 +80,7 @@ const UP =
 const shell = () => {
   $('adm').innerHTML = `<div class="w adin">
     <div class="row sp wrap" style="margin-bottom:8px">
-      <h2 class="serif h2">Painel </h2>
+      <h2 class="serif h2">Painel</h2>
       <div class="row wrap">
         <button class="b ghost" data-a="bk" aria-label="Backup">Backup</button>
         <button class="b ghost" data-a="exit">Sair</button>
@@ -195,9 +195,9 @@ function tProd() {
       : ''
   }
   <section class="box">
-    <h3 class="serif h3" id="pft">${A.edit ? 'Editar peça' : 'Cadastrar peça'}</h3>
+    <h3 class="serif h3" id="pft">${A.edit ? 'Editar produto' : 'Cadastrar produto'}</h3>
     <div class="fm">
-      ${F('pf-title', 'Nome da peça', 'maxlength=120', 'full')}
+      ${F('pf-title', 'Nome do produto', 'maxlength=120', 'full')}
       <label class="lb">Categoria
         <select class="in" id="pf-cat">
           ${DB.categories.map((c) => `<option>${esc(c.name)}</option>`).join('')}
@@ -226,14 +226,14 @@ function tProd() {
     </div>
     <p id="perr" class="err hid" style="margin-bottom:12px"></p>
     <div class="row wrap" style="margin-top:16px;border-top:1px solid var(--bd);padding-top:16px">
-      <button class="b gold" data-a="psave" style="min-width:140px">Salvar peça</button>
+      <button class="b gold" data-a="psave" style="min-width:140px">Salvar produto</button>
       <button class="b ghost" data-a="pc">Cancelar</button>
     </div>
   </section>
   <section class="box">
     <div class="row sp wrap" style="margin-bottom:16px">
-      <h3 class="serif h3" style="margin-bottom:0;border:0;padding:0">Peças cadastradas</h3>
-      <input class="in" id="fq" placeholder="Buscar peça" style="max-width:240px" value="${esc(A.fq)}">
+      <h3 class="serif h3" style="margin-bottom:0;border:0;padding:0">Produtos cadastrados</h3>
+      <input class="in" id="fq" placeholder="Buscar produto" style="max-width:240px" value="${esc(A.fq)}">
     </div>
     <div id="pl"></div>
   </section>`;
@@ -290,7 +290,7 @@ function plist() {
           </div>
         </div>`
       )
-      .join('') || '<p class="tm center" style="padding:24px 0">Nenhuma peça encontrada.</p>';
+      .join('') || '<p class="tm center" style="padding:24px 0">Nenhum produto encontrado.</p>';
   if (l.length > m.length)
     $('pl').insertAdjacentHTML(
       'beforeend',
@@ -405,7 +405,7 @@ async function saveP() {
     p = parseFloat(g('price')),
     o = parseFloat(g('promo')),
     er = $('perr');
-  const m = t.length < 2 ? 'Informe o nome da peça.'
+  const m = t.length < 2 ? 'Informe o nome do produto.'
     : !(p > 0 && p < 1e7) ? 'Informe um preço original válido.'
     : o >= p ? 'O preço promocional deve ser menor que o original.'
     : '';
@@ -441,7 +441,7 @@ async function saveP() {
   Draft.clear();
   render();
   show(0);
-  toast('Peça salva.');
+  toast('Produto salvo.');
 }
 
 const mpv = () => {
@@ -726,7 +726,7 @@ ACT.pdup = async (id) => {
   DB.prod.splice(DB.prod.findIndex(x => x.id == id) + 1, 0, data);
   render();
   plist();
-  toast('Peça duplicada.');
+  toast('Produto duplicado.');
 };
 
 const pmv = async (id, d) => {
@@ -752,7 +752,7 @@ ACT.pdel = async (id) => {
     DB.prod = DB.prod.filter(x => x.id != id);
     render();
     show(0);
-    toast('Peça excluída.');
+    toast('Produto excluído.');
   } else {
     A.del = 'p' + id;
     plist();
