@@ -92,7 +92,7 @@ const lock = () => {
   document.documentElement.classList.toggle('al', on);
   if (on === !!lock.on) return;
   lock.on = on;
-  document.querySelectorAll('body>header,body>main,body>footer,#tt').forEach((e) => (e.inert = on));
+  document.querySelectorAll('body>header,body>main,body>footer,#tt,.skip').forEach((e) => (e.inert = on));
   if (on) lock.f = document.activeElement;
   else if (lock.f && lock.f.isConnected && lock.f.focus) lock.f.focus({ preventScroll: true });
 };
