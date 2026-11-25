@@ -1,3 +1,7 @@
+/* =============================================================
+   config.js — constantes, utilitários globais, ícones e Supabase.
+   Carrega primeiro: storage, images, auth, shop, admin e app usam isto.
+   ============================================================= */
 const V = 12, PFX = 'loja_', KEY = {
   prod: PFX + 'products',
   cart: PFX + 'cart',
@@ -13,11 +17,12 @@ const V = 12, PFX = 'loja_', KEY = {
   adm: PFX + 'adm',
   chg: PFX + 'chg',
   pub: PFX + 'pub',
-  log: PFX + 'log'
+  log: PFX + 'log',
+  wish: PFX + 'wish'
 };
 
 const SB_URL = 'https://ncrsodkpduroulzkpaky.supabase.co';
-const SB_KEY = 'sb_publishable_OOejb1xfSYPHVD8Xf4F09g_YT_Sa5lu';
+const SB_KEY = 'sb_publishable_OOejb1xfSYPHVD8Xf4F09g_YT_Sa5lu'; // chave pública (publishable): feita para o front
 
 const GH_OWNER = 'Wendell544';
 const GH_REPO = 'Sualoja';
@@ -25,7 +30,10 @@ const GH_REPO = 'Sualoja';
 const WAD = '5583996006884';
 const CATS0 = ['Novidades', 'Promoções', 'Destaques', 'Mais Vendidos', 'Exclusivos'];
 
+/* Padrões da loja. Qualquer chave salva em settings.data (Supabase) tem prioridade. */
 const SET0 = {
+  name: 'Sua Loja', // logo tipográfico, rodapé, título da aba e mensagem do pedido
+  logo: null, // opcional: { light: 'https://…', dark: 'https://…' } troca o logo tipográfico por imagem
   kick: 'Qualidade que você sente',
   title: 'O melhor para você está aqui',
   text: 'Selecionamos produtos de qualidade para o seu dia a dia. Escolha o que ama e finalize no WhatsApp.',
@@ -58,76 +66,103 @@ const debounce = (fn, ms = 300) => {
     t = setTimeout(() => fn(...a), ms);
   };
 };
+/* Rolagem suave só para quem não pediu movimento reduzido. */
+const smooth = () => (matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth');
 
-const toast = (t) => {
+/* Toast: a região aria-live (#ts) nunca sai do DOM; só a visibilidade muda.
+   k = 'ok' | 'er'. Sem k, o tipo é deduzido do texto (mensagens do admin). */
+const toast = (t, k) => {
   const e = $('ts');
   if (!e) return;
-  e.textContent = t;
-  e.classList.remove('hid');
+  k = k || (/inválid|falh|erro|expirad|negad|permiss|não foi|esgotad|limite|aguarde|informe|use |deve|já existe|mova|cole |sem espaço/i.test(t) ? 'er' : 'ok');
+  e.innerHTML = ic(k === 'er' ? 'alert' : 'check', 18) + '<span>' + esc(t) + '</span>';
+  e.classList.toggle('er', k === 'er');
+  e.classList.add('on');
   clearTimeout(toast.t);
-  toast.t = setTimeout(() => e.classList.add('hid'), 2800);
+  toast.t = setTimeout(() => {
+    e.classList.remove('on');
+    toast.t = setTimeout(() => (e.textContent = ''), 400);
+  }, 3200);
 };
 
+/* Overlays: trava a rolagem, deixa o fundo inerte (foco fica no diálogo)
+   e devolve o foco para quem abriu quando tudo fecha. */
 const lock = () => {
-  document.documentElement.classList.toggle(
-    'al',
-    ['lg', 'pm', 'adm'].some((i) => !$(i).classList.contains('hid')) ||
-      $('drw').classList.contains('on'),
-  );
+  const on = ['lg', 'pm', 'adm'].some((i) => !$(i).classList.contains('hid')) || $('drw').classList.contains('on');
+  document.documentElement.classList.toggle('al', on);
+  if (on === !!lock.on) return;
+  lock.on = on;
+  document.querySelectorAll('body>header,body>main,body>footer,#tt,.skip').forEach((e) => (e.inert = on));
+  if (on) lock.f = document.activeElement;
+  else if (lock.f && lock.f.isConnected && lock.f.focus) lock.f.focus({ preventScroll: true });
 };
 
 const modal = (id, on) => {
-  $(id).classList.toggle('hid', !on);
+  const e = $(id);
+  e.classList.toggle('hid', !on);
   lock();
-  if (on && id === 'lg') setTimeout(() => $('pw')?.focus(), 50);
+  if (on && id !== 'pm') {
+    setTimeout(() => (id === 'lg' ? ($('em').value ? $('pw') : $('em')) : e).focus({ preventScroll: true }), 50);
+  }
 };
 
 const drawer = (on) => {
   $('drw').classList.toggle('on', !!on);
   $('ov').classList.toggle('hid', !on);
+  const b = document.querySelector('[data-a=cart]');
+  if (b) b.setAttribute('aria-expanded', !!on);
   lock();
+  if (on) setTimeout(() => $('drw').focus({ preventScroll: true }), 50);
 };
 
+/* Ícones (traço 1.7, 24×24). Adicione aqui e use com ic('nome', tamanho). */
 const IC = {
-  gem: '<path d="M6 3h12l4 6-10 12L2 9z"/><path d="M11 3 8 9l4 12 4-12-3-6"/><path d="M2 9h20"/>',
-  search: '<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
-  bag: '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/>',
+  bag: '<path d="M5 8h14l-1.2 12.1a1 1 0 0 1-1 .9H7.2a1 1 0 0 1-1-.9z"/><path d="M9 8V7a3 3 0 0 1 6 0v1"/>',
   x: '<path d="M18 6 6 18M6 6l12 12"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
   minus: '<path d="M5 12h14"/>',
-  trash: '<path d="M3 6h18M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>',
+  trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
   wa: '<path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.7-5.2A8.5 8.5 0 1 1 21 11.5z"/><path d="M9 8.5c0 3.5 3 6.5 6.5 6.5l1-1.5-2-1-1 .8c-1-.4-1.8-1.2-2.2-2.2l.8-1-1-2z"/>',
   star: '<path d="m12 2 3 6.5 7 .8-5.2 4.8 1.4 7L12 17.5 5.8 21l1.4-7L2 9.3l7-.8z"/>',
-  moon: '<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/>',
+  heart: '<path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7z"/>',
+  moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
   prev: '<path d="m15 18-6-6 6-6"/>',
   next: '<path d="m9 18 6-6-6-6"/>',
-  pause: '<path d="M8 5v14M16 5v14"/>',
-  play: '<path d="M7 4l12 8-12 8z"/>',
-  check: '<path d="m20 6-11 11-5-5"/>',
-  eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
-  share: '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 3.9M15.4 6.6 8.6 10.5"/>'
+  up: '<path d="M12 19V5M6 11l6-6 6 6"/>',
+  arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+  check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  alert: '<circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5h.01"/>',
+  share: '<path d="M12 15V3M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>',
+  retry: '<path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/>',
+  ig: '<rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/>',
+  fb: '<path d="M14 8h2.5V4.5H14A3.5 3.5 0 0 0 10.5 8v2.5H8V14h2.5v6.5H14V14h2.5l.5-3.5h-3V8.5a.5.5 0 0 1 .5-.5z"/>',
+  mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/>'
 };
 
 const ic = (n, s = 20) =>
-  '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+  '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' +
   (IC[n] || '') +
   '</svg>';
 
+/* Imagem neutra para produto sem foto (tom quente + moldura dourada). */
 const art = (h) =>
   'data:image/svg+xml;utf8,' +
   encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><radialGradient id="g" cx="50%" cy="38%" r="75%"><stop offset="0" stop-color="hsl(' +
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500"><defs><radialGradient id="g" cx="50%" cy="38%" r="80%"><stop offset="0" stop-color="hsl(' +
       h +
-      ',20%,25%)"/><stop offset="1" stop-color="hsl(' +
+      ',16%,27%)"/><stop offset="1" stop-color="hsl(' +
       h +
-      ',15%,8%)"/></radialGradient></defs><rect width="400" height="400" fill="url(#g)"/><g fill="none" stroke="#cda353" stroke-width="3" stroke-linejoin="round"><rect x="140" y="130" width="120" height="100" rx="8"/><circle cx="175" cy="165" r="12"/><path d="M145 225l40-35 30 25 20-15 30 25"/></g><text x="200" y="365" text-anchor="middle" font-family="Georgia,serif" font-size="20" letter-spacing="6" fill="#cda353" opacity=".7">LOJA</text></svg>',
+      ',14%,10%)"/></radialGradient></defs><rect width="400" height="500" fill="url(#g)"/><g fill="none" stroke="#cda353" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" opacity=".7"><rect x="150" y="196" width="100" height="84" rx="8"/><circle cx="178" cy="224" r="9"/><path d="M156 274l31-27 24 20 16-12 21 19"/></g></svg>',
   );
 
+/* Produtos de exemplo — usados só em localhost quando o banco não tem produtos. */
 const seed = () => [
   ['Produto Especial', 'Novidades', 129.9, 99.9, '3x sem juros', 'Item selecionado com carinho para você.', 1, 200],
   ['Item Premium', 'Destaques', 189.9, 0, '4x sem juros', 'Qualidade superior em cada detalhe.', 1, 330],
   ['Kit Completo', 'Mais Vendidos', 249.9, 219.9, '5x sem juros', 'Conjunto completo com o melhor custo-benefício.', 0, 45],
-  ['Edição Limitada', 'Exclusivos', 349.9, 0, '6x sem juros', 'Peça exclusiva, poucas unidades disponíveis.', 0, 110],
+  ['Edição Limitada', 'Exclusivos', 349.9, 0, '6x sem juros', 'Item exclusivo, poucas unidades disponíveis.', 0, 110],
   ['Oferta do Dia', 'Promoções', 89.9, 69.9, '2x sem juros', 'Aproveite o preço especial por tempo limitado.', 0, 25],
   ['Mais Vendido', 'Mais Vendidos', 159.9, 0, '4x sem juros', 'O favorito dos nossos clientes.', 1, 0],
   ['Novidade da Semana', 'Novidades', 199.9, 0, '4x sem juros', 'Chegou recentemente em nossa loja.', 0, 300],
@@ -146,25 +181,5 @@ const seed = () => [
   created_at: new Date().toISOString()
 }));
 
-const ads0 = () => [
-  {
-    id: 1,
-    on: true,
-    title: 'Atendimento VIP',
-    text: 'Fale com nossa equipe e finalize seu pedido pelo WhatsApp.',
-    btn: 'Chamar no WhatsApp',
-    link: '',
-    img: null
-  },
-  {
-    id: 2,
-    on: true,
-    title: 'Novidades da Semana',
-    text: 'Confira os últimos lançamentos da nossa loja.',
-    btn: 'Ver Coleção',
-    link: '',
-    img: null
-  }
-];
-
-const SB = supabase.createClient(SB_URL, SB_KEY);
+/* Se o CDN do supabase-js falhar, SB fica null e a loja mostra o estado de erro (com "Tentar novamente"). */
+const SB = window.supabase ? supabase.createClient(SB_URL, SB_KEY) : null;
