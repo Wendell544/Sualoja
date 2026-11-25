@@ -54,7 +54,7 @@ const ACT = {};
 const $ = (i) => document.getElementById(i);
 const money = (n) => Number(n || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => '&#' + c.charCodeAt(0) + ';');
-const nz = (s) => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+const nz = (s) => String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 const okUrl = (u) => /^https?:\/\//i.test(u || '');
 const R = (r) => !r ? null : typeof r === 'string' ? { u: r } : r;
 const uid = () => (uid.n = Math.max(Date.now(), (uid.n || 0) + 1));
