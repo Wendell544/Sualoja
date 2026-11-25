@@ -1,3 +1,9 @@
+/* =============================================================
+   app.js — eventos globais (delegação data-a), atalhos e boot.
+   Também atende o admin.js: busca (fq), rascunho (pf-*), msearch,
+   uploads (pf-file / mf-file / sf-file) e Ctrl+S.
+   ============================================================= */
+let pd = null;
 document.addEventListener('click', (e) => {
   const t = e.target.closest('[data-a]');
   if (t) {
@@ -5,32 +11,27 @@ document.addEventListener('click', (e) => {
     if (f) f(t.dataset.v, t, e);
     return;
   }
-  if (e.target.classList && e.target.classList.contains('md')) ACT.close();
+  // Fundo do modal fecha — só se o clique começou nele (arrastar texto não fecha).
+  if (e.target.classList && e.target.classList.contains('md') && pd === e.target) ACT.close();
 });
 
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') ACT.close();
-  if (
-    (e.key === 'ArrowLeft' || e.key === 'ArrowRight') &&
-    !$('pm').classList.contains('hid') &&
-    PM.p &&
-    PM.p.images.length > 1 &&
-    !/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)
-  ) {
+  const k = e.key, t = e.target, pm = !$('pm').classList.contains('hid');
+  if (k === 'Escape') pm && PM.z ? ACT.pz() : ACT.close();
+  if ((k === 'ArrowLeft' || k === 'ArrowRight') && pm && PM.p && PM.p.images.length > 1 && !/INPUT|TEXTAREA|SELECT/.test(t.tagName)) {
     e.preventDefault();
-    ACT.pnav(e.key === 'ArrowLeft' ? -1 : 1);
+    ACT.pnav(k === 'ArrowLeft' ? -1 : 1);
   }
-  if (
-    (e.key === 'Enter' || e.key === ' ') &&
-    e.target.getAttribute &&
-    e.target.getAttribute('role') === 'button' &&
-    e.target.dataset.a
-  ) {
+  if ((k === 'Enter' || k === ' ') && t.getAttribute && t.getAttribute('role') === 'button' && t.dataset.a) {
     e.preventDefault();
-    e.target.click();
+    t.click();
   }
-  if (e.key === 'Enter' && e.target.id === 'pw') ACT.login();
-  if (A.ok && (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+  if (k === 'Enter' && t.id === 'pw') ACT.login();
+  if (k === 'Enter' && t.classList && t.classList.contains('qi')) {
+    t.blur();
+    $('colecao').scrollIntoView({ behavior: smooth() });
+  }
+  if (A.ok && (e.ctrlKey || e.metaKey) && String(k).toLowerCase() === 's') {
     if (A.tab === 0) {
       e.preventDefault();
       if ($('pf-title')) saveP();
@@ -48,8 +49,7 @@ document.addEventListener('input', (e) => {
     A.pl = 20;
     plist();
   } else if (A.ok && A.tab === 0 && id.startsWith('pf-')) drs();
-  else if (e.target.dataset && e.target.dataset.a === 'msearch')
-    ACT.msearch(e.target.dataset.v, e.target);
+  else if (e.target.dataset && e.target.dataset.a === 'msearch') ACT.msearch(e.target.dataset.v, e.target);
 });
 
 document.addEventListener('change', (e) => {
@@ -66,12 +66,14 @@ document.addEventListener('change', (e) => {
   }
 });
 
-let sx = null;
+/* Galeria: swipe troca a foto; com zoom ativo, o ponteiro move a ampliação. */
+let sx = null, zq = 0, ze = null;
 document.addEventListener('pointerdown', (e) => {
-  sx = e.pointerType !== 'mouse' && e.target.closest && e.target.closest('.pm-main') ? e.clientX : null;
-});
+  pd = e.target;
+  sx = !PM.z && e.pointerType !== 'mouse' && e.target.closest && e.target.closest('.pm-main') ? e.clientX : null;
+}, true);
 document.addEventListener('pointerup', (e) => {
-  if (sx !== null && PM.p && PM.p.images.length > 1 && Math.abs(e.clientX - sx) > 50) {
+  if (sx !== null && !PM.z && PM.p && PM.p.images.length > 1 && Math.abs(e.clientX - sx) > 50) {
     swp = 1;
     setTimeout(() => {
       swp = 0;
@@ -80,7 +82,16 @@ document.addEventListener('pointerup', (e) => {
   }
   sx = null;
 });
+document.addEventListener('pointermove', (e) => {
+  if (!PM.z || !e.target.closest || !e.target.closest('.pm-main')) return;
+  ze = e;
+  zq = zq || requestAnimationFrame(() => {
+    zq = 0;
+    zoomAt(ze);
+  });
+}, { passive: true });
 
+/* Busca em tempo real (header + coleção sincronizados) */
 let qt;
 const onQ = (e) => {
   S.q = e.target.value;
@@ -93,8 +104,7 @@ const onQ = (e) => {
     grid();
     if (e.target.id === 'qh' && S.q.trim()) {
       const r = $('colecao').getBoundingClientRect();
-      if (r.top > innerHeight * 0.5 || r.bottom < 0)
-        $('colecao').scrollIntoView({ behavior: 'smooth' });
+      if (r.top > innerHeight * 0.5 || r.bottom < 0) $('colecao').scrollIntoView({ behavior: smooth() });
     }
   }, 160);
 };
@@ -110,42 +120,73 @@ $('so').addEventListener('change', () => {
 addEventListener('pagehide', () => {
   if (A.ok && A.tab === 0) drsNow();
 });
-addEventListener('hashchange', () => openFromHash());
+/* #p=id abre o produto; "voltar" (sem #p=) fecha o modal. */
+addEventListener('hashchange', () => {
+  if (/^#p=/.test(location.hash)) return openFromHash();
+  if (!$('pm').classList.contains('hid')) {
+    PM.h = 0;
+    PM.z = false;
+    modal('pm', 0);
+  }
+});
+
+/* Header com borda após rolar + botão "voltar ao topo" após 400px (1 leitura por frame). */
+let sq = 0;
+const onS = () => {
+  sq = 0;
+  const y = scrollY;
+  $('hd').classList.toggle('sc', y > 8);
+  $('tt').classList.toggle('on', y > 400);
+};
+addEventListener('scroll', () => sq || (sq = requestAnimationFrame(onS)), { passive: true });
+addEventListener('resize', debounce(() => railUI(), 150));
 
 const pf = Prefs.get();
 if (pf.theme) document.documentElement.dataset.theme = pf.theme;
+tcol();
+try {
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    if (Prefs.get().theme) return;
+    document.documentElement.dataset.theme = e.matches ? 'dark' : 'light';
+    tcol();
+  });
+} catch (e) {}
 document.querySelectorAll('[data-i]').forEach((e) => (e.innerHTML = ic(e.dataset.i, +e.dataset.s || 20)));
+onS();
 
-// Failsafe: se por algum motivo render() não rodar em 6s, libera a página.
+// Failsafe: se por algum motivo o boot não terminar em 6s, libera a página.
 setTimeout(() => document.documentElement.classList.remove('is-loading'), 6000);
 
 (async () => {
   try {
     await loadFromSupabase();
-    const session = await Auth.getSession();
-    if (session) {
-      const user = session.user;
-      if (user?.app_metadata?.role === 'admin') {
-        A.ok = true;
-      }
+    // Lista vazia: loja realmente vazia ou falha de rede? Uma consulta HEAD decide.
+    if (!DB.prod.length) {
+      const r = await SB.from('products').select('id', { count: 'exact', head: true });
+      if (r.error) S.err = 1;
     }
-    try { await IMG.migrateLegacy(); } catch (e) {}
-
-    S.cat = pf.cat || 'Todos';
-    S.srt = pf.srt || 'feat';
-    $('so').value = S.srt;
-
-    try {
-      render();
-    } finally {
-      document.documentElement.classList.remove('is-loading');
-    }
-    setTimeout(openFromHash, 60);
   } catch (e) {
-    console.error('Falha ao iniciar a loja:', e);
-    try { render(); } catch (_) {}
+    console.error('Falha ao carregar a loja:', e);
+    S.err = 1;
+  }
+  DB.set = { ...SET0, ...DB.set };
+  DB.set.show = { ...SET0.show, ...(DB.set.show || {}) };
+  S.cat = pf.cat || 'Todos';
+  S.srt = ['feat', 'new', 'lo', 'hi'].includes(pf.srt) ? pf.srt : 'feat';
+  $('so').value = S.srt;
+  try {
+    render();
+  } catch (e) {
+    console.error('Falha ao renderizar a loja:', e);
+  } finally {
     document.documentElement.classList.remove('is-loading');
   }
+  setTimeout(openFromHash, 60);
+  try {
+    const session = await Auth.getSession();
+    if (session && session.user?.app_metadata?.role === 'admin') A.ok = true;
+    await IMG.migrateLegacy();
+  } catch (e) {}
 })();
 
 try {
