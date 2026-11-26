@@ -182,7 +182,7 @@ function rails() {
   railUI(r);
 }
 
-/* Chips de filtro: Todos · Favoritos · categorias. Só re-renderiza se a lista mudar. */
+/* Chips de filtro: Todos · categorias · Favoritos. Só re-renderiza se a lista mudar. */
 const chips = () => {
   const e = $('fc'), c = cats(), n = W.list().length, k = c.map((x) => x.name).join('|') + '#' + n;
   e.hidden = S.err || !DB.prod.length;
