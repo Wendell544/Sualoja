@@ -1,5 +1,5 @@
 /* =============================================================
-   Design system "editorial luxury" — v19
+   Design system "editorial luxury" — v20
    1 Tokens · 2 Base · 3 Utilitários · 4 Controles · 5 Header · 6 Hero
    7 Seções e rails · 8 Coleção e cards · 9 Estados · 10 Rodapé
    11 Sacola · 12 Modais · 13 Toast · 14 Admin · 15 Boot · 16 Movimento
@@ -16,6 +16,7 @@
 --sh-lg:0 10px 28px rgba(29,26,22,.08),0 32px 80px rgba(29,26,22,.18);
 --r-xs:4px;--r-sm:8px;--r-md:12px;--r-lg:16px;--r-f:999px;
 --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:64px;
+--app-v:20;
 --tap:44px;--gut:16px;--max:1280px;--hdh:64px;--sec:64px;
 /* 🔽 TROCA DE LOGO (o slot .logo nunca deve ser removido):
    - Para usar imagem: --logo-src: url("img/logo.png");   (opcional: --logo-src-dark: url("img/logo-escura.png"); para o tema escuro)
@@ -220,7 +221,7 @@ html:not(.is-loading) .hero-sk{display:none}
 .col-h{flex-wrap:wrap}
 .tools{display:flex;align-items:center;gap:var(--s2)}
 .ms{position:relative;flex:1;min-width:0}
-.so{width:auto;min-width:11rem;min-height:var(--tap)}
+.srt{width:auto;min-width:11rem;min-height:var(--tap)}
 #colecao{min-height:calc(100vh - var(--hdh));min-height:calc(100svh - var(--hdh))}
 .fcw{position:relative;margin-bottom:var(--s5)}
 .fc{scroll-snap-type:x proximity}
@@ -257,7 +258,7 @@ html:not(.is-loading) .hero-sk{display:none}
 @container (max-width:190px){.cd-a .b svg{display:none}.cd-a .b{padding:0 var(--s2)}.cd-t{font-size:var(--fs-md)}}
 @media(hover:hover){.cd:hover .cd-m{transform:translateY(-3px);box-shadow:var(--sh-md)}.cd:hover .cd-i img{transform:scale(1.02)}}
 @media(max-width:640px){
-.tools{width:100%}.so{min-width:0;max-width:46%}
+.tools{width:100%}.srt{min-width:0;max-width:46%}
 .fcw{margin-inline:calc(var(--gut) * -1)}.fc{padding-inline:var(--gut);scroll-padding-inline:var(--gut)}}
 @media(min-width:641px){.ms{display:none}}
 @media(min-width:601px){.gr{grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s7) var(--s5)}}
@@ -326,16 +327,17 @@ html:not(.is-loading) .hero-sk{display:none}
 .md{position:fixed;inset:0;z-index:70;width:100vw;display:flex;align-items:center;justify-content:center;padding:var(--s4);background:var(--ov);animation:fd var(--t2) var(--e);overscroll-behavior:contain}
 .md>div{display:flex;flex-direction:column;gap:var(--s4);width:100%;max-width:420px;padding:var(--s6);border-radius:var(--r-lg);background:var(--sf);box-shadow:var(--sh-lg);outline:none;animation:mdIn var(--t3) var(--e)}
 @keyframes mdIn{from{opacity:0;transform:translateY(14px) scale(.98)}}
-.pm{--fade:var(--sf);padding:var(--s5)}
-.pm>div{position:relative;display:block;max-width:1120px;height:min(90vh,880px);height:min(90dvh,880px);padding:0;overflow:hidden}
-.pm-s{display:grid;grid-template-columns:minmax(0,55fr) minmax(0,45fr);align-content:start;height:100%;overflow-y:auto;overscroll-behavior:contain}
+.pm{--fade:var(--sf);--pmx:clamp(var(--s5),3vw,var(--s7));padding:var(--s5)}
+/* PC e tablet deitado: duas colunas de altura fixa. Fotos à esquerda (paradas e inteiras, sem corte);
+   informações à direita, rolando sozinhas, com os botões de compra sempre à vista. */
+.pm>div{position:relative;display:block;max-width:1180px;height:min(88vh,800px);height:min(88dvh,800px);padding:0;overflow:hidden}
+.pm-s{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(min(100%,22rem),1fr);height:100%}
 .pm-x{position:absolute;top:var(--s3);right:var(--s3);z-index:6;border-color:transparent;box-shadow:var(--sh-sm)}
-.pm-img{align-self:start;display:flex;flex-direction:column;gap:var(--s3);padding:var(--s5)}
-.pm-main,.pm-thumbs{width:min(100%,calc((min(90vh,880px) - 150px) * .8));width:min(100%,calc((min(90dvh,880px) - 150px) * .8));margin-inline:auto}
-.pm-main{position:relative;aspect-ratio:4/5;overflow:hidden;border-radius:var(--r-md);background:var(--sf2);touch-action:pan-y;isolation:isolate}
+.pm-img{display:flex;flex-direction:column;gap:var(--s3);min-width:0;min-height:0;padding:var(--s5);background:var(--sf2)}
+.pm-main{position:relative;flex:1;min-height:0;overflow:hidden;border-radius:var(--r-md);background:var(--sf2);touch-action:pan-y;isolation:isolate}
 .pm-z{position:absolute;inset:0;display:block;width:100%;height:100%;cursor:zoom-in}
 .pm-z:focus-visible{outline-offset:-3px}
-.pm-z img{width:100%;height:100%;object-fit:cover;transform-origin:var(--zx,50%) var(--zy,50%);transition:transform var(--t3) var(--e),opacity var(--t3) var(--e)}
+.pm-z img{width:100%;height:100%;object-fit:contain;transform-origin:var(--zx,50%) var(--zy,50%);transition:transform var(--t3) var(--e),opacity var(--t3) var(--e)}
 .pm-main.zm{touch-action:none}
 .pm-main.zm .pm-z{cursor:zoom-out}
 .pm-main.zm .pm-z img{transform:scale(2.2)}
@@ -344,13 +346,15 @@ html:not(.is-loading) .hero-sk{display:none}
 .pm-a.pv{left:var(--s3)}.pm-a.nx{right:var(--s3)}
 .pm-c{position:absolute;bottom:var(--s3);left:50%;z-index:2;padding:2px var(--s3);border-radius:var(--r-f);background:rgba(20,17,13,.62);color:#fff;font-size:var(--fs-xs);font-variant-numeric:tabular-nums;pointer-events:none;transform:translateX(-50%)}
 .pm-main.zm .pm-a,.pm-main.zm .pm-c{opacity:0;pointer-events:none}
-.pm-thumbs{display:flex;gap:var(--s2);overflow-x:auto;scrollbar-width:none;padding:2px}
+.pm-thumbs{flex:none;display:flex;gap:var(--s2);overflow-x:auto;scrollbar-width:none;padding:2px}
 .pm-thumbs::-webkit-scrollbar{display:none}
+.pm-thumbs>:first-child{margin-left:auto}.pm-thumbs>:last-child{margin-right:auto}
 .pm-th{position:relative;flex:none;width:56px;aspect-ratio:4/5;overflow:hidden;border:1px solid var(--bd);border-radius:var(--r-sm);background:var(--sf2);opacity:.62;transition:opacity var(--t2),border-color var(--t2)}
 .pm-th:hover,.pm-th.on{opacity:1}
 .pm-th.on{border-color:var(--tx);box-shadow:inset 0 0 0 1px var(--tx)}
 .pm-th img{width:100%;height:100%;object-fit:cover}
-.pm-info{display:flex;flex-direction:column;gap:var(--s4);min-width:0;padding:var(--s7) var(--s7) var(--s6) var(--s3)}
+.pm-r{min-width:0;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+.pm-info{display:flex;flex-direction:column;gap:var(--s4);min-width:0;padding:var(--s7) var(--pmx) var(--s5)}
 .pm-top{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);padding-right:var(--s7)}
 .pm-tools{display:flex;gap:var(--s2)}
 .pm-title{font:500 clamp(1.75rem,1.3rem + 1.6vw,2.625rem)/1.1 var(--fd);letter-spacing:-.02em;text-wrap:balance}
@@ -359,31 +363,46 @@ html:not(.is-loading) .hero-sk{display:none}
 .pm-price s{color:var(--mt)}
 .pm-desc{padding-block:var(--s5);border-block:1px solid var(--bd);line-height:1.75;white-space:pre-line}
 .pm-un{display:flex;align-items:center;gap:var(--s2);padding:var(--s3) var(--s4);border-radius:var(--r-sm);background:rgba(180,35,24,.08);color:var(--er);font-size:var(--fs-sm)}
-.pm-act{display:flex;gap:var(--s3);margin-top:var(--s2)}
-.pm-act .b{flex:1;min-height:52px}
+.pm-act{position:sticky;bottom:0;z-index:3;display:flex;flex-wrap:wrap;gap:var(--s3);padding-block:var(--s3);background:var(--sf)}
+.pm-act .b{flex:1 1 auto;min-height:52px;white-space:nowrap}
 .pm-note{display:flex;align-items:center;gap:var(--s2);color:var(--mt);font-size:var(--fs-xs)}
-.rel{grid-column:1/-1;padding:var(--s6) var(--gut) var(--s7);border-top:1px solid var(--bd)}
+.rel{padding:var(--s6) var(--pmx) var(--s7);border-top:1px solid var(--bd)}
 .rel h3{margin-bottom:var(--s4)}
+.rel .rl-w{margin-inline:calc(var(--pmx) * -1)}
+.rel .rl{gap:var(--s4);padding-inline:var(--pmx);scroll-padding-inline:var(--pmx)}
+.rel .rl>*{flex-basis:calc((100% - var(--s4)) / 2.2)}
 .pm-bar{display:none}
 @media(hover:hover){.pm-a{opacity:0}.pm-main:hover .pm-a,.pm-a:focus-visible{opacity:1}}
-@media(max-width:768px),(max-height:560px){
+/* PC com tela baixa (notebook com zoom de 125%/150%): menos respiro para a foto ganhar espaço. */
+@media(max-height:640px){.pm-img{gap:var(--s2);padding:var(--s4)}.pm-th{width:44px}.pm-info{padding-top:var(--s6)}}
+/* Celular e tablet em pé (e celular deitado): tela cheia, uma coluna e barra de compra fixa embaixo.
+   A altura só conta em tela de toque: PC com janela baixa continua com as 2 colunas. */
+@media(max-width:768px),(max-height:480px) and (pointer:coarse){
 .pm{padding:0}
 .pm>div{max-width:none;height:100%;height:100dvh;border-radius:0;box-shadow:none}
-.pm-s{display:flex;flex-direction:column}
+.pm-s{display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain}
 .pm-s>*{flex:none}
-.pm-img{align-self:stretch;padding:0}
-.pm-main{width:min(100%,calc(72vh * .8));width:min(100%,calc(72svh * .8));border-radius:0}
+.pm-img{gap:var(--s3);padding:0;background:none}
+.pm-main{flex:none;width:min(100%,calc(72vh * .8));width:min(100%,calc(72svh * .8));margin-inline:auto;aspect-ratio:4/5;border-radius:0}
+.pm-z img{object-fit:cover}
 .pm-thumbs{width:100%;padding:var(--s3) var(--gut) 0}
+.pm-thumbs>:first-child{margin-left:0}.pm-thumbs>:last-child{margin-right:0}
+.pm-th{width:56px}
+.pm-r{overflow:visible}
 .pm-x{top:calc(var(--s3) + env(safe-area-inset-top,0px))}
 .pm-info{padding:var(--s5) var(--gut) var(--s6)}
 .pm-top{padding-right:0}
 .pm-act{display:none}
+.rel{padding:var(--s6) var(--gut) var(--s7)}
+.rel .rl-w{margin-inline:calc(var(--gut) * -1)}
+.rel .rl{padding-inline:var(--gut);scroll-padding-inline:var(--gut)}
+.rel .rl>*{flex-basis:calc((100% - var(--s4) * 2) / 2.2)}
 .pm-bar{position:sticky;bottom:0;z-index:4;display:flex;align-items:center;gap:var(--s3);margin-top:auto;padding:var(--s3) var(--gut) calc(var(--s3) + env(safe-area-inset-bottom,0px));border-top:1px solid var(--bd);background:var(--sf);box-shadow:0 -10px 30px rgba(0,0,0,.07)}
 .pm-bar .b{flex:1}
 .pm-bp{display:flex;flex-direction:column;line-height:1.2}
 .pm-bp b{font-size:var(--fs-lg)}
 .pm-bp s{color:var(--mt);font-size:var(--fs-xs)}}
-@media(min-width:601px) and (max-width:768px),(min-width:601px) and (max-height:560px){.pm-img{padding:var(--s5) var(--gut) 0}.pm-main{border-radius:var(--r-md)}.pm-thumbs{width:min(100%,calc(72vh * .8));width:min(100%,calc(72svh * .8));padding-inline:0}}
+@media(min-width:601px) and (max-width:768px),(min-width:601px) and (max-height:480px) and (pointer:coarse){.pm-img{padding:var(--s5) var(--gut) 0}.pm-main{border-radius:var(--r-md)}.pm-thumbs{width:min(100%,calc(72vh * .8));width:min(100%,calc(72svh * .8));margin-inline:auto;padding-inline:0}.rel .rl>*{flex-basis:calc((100% - var(--s4) * 3) / 3.25)}}
 
 /* 13 · TOAST ------------------------------------------------- */
 .ts{position:fixed;left:50%;bottom:calc(var(--s5) + env(safe-area-inset-bottom,0px));z-index:100;display:flex;align-items:center;gap:var(--s2);width:max-content;max-width:calc(100% - var(--s6));padding:var(--s3) var(--s5) var(--s3) var(--s4);border-radius:var(--r-md);background:var(--ink);color:var(--oink);box-shadow:var(--sh-lg);font-size:var(--fs-sm);font-weight:500;line-height:1.4;opacity:0;pointer-events:none;transform:translate(-50%,var(--s3));transition:opacity var(--t2) var(--e),transform var(--t3) var(--e)}
@@ -391,7 +410,7 @@ html:not(.is-loading) .hero-sk{display:none}
 .ts svg{flex:none;color:var(--gd)}
 .ts.er svg{color:#f0857a}
 [data-theme=dark] .ts{border:1px solid #3d362f;background:#2c2722}
-@media(max-width:768px),(max-height:560px){.ts{top:calc(var(--s3) + env(safe-area-inset-top,0px));bottom:auto;transform:translate(-50%,calc(var(--s3) * -1))}}
+@media(max-width:768px),(max-height:480px) and (pointer:coarse){.ts{top:calc(var(--s3) + env(safe-area-inset-top,0px));bottom:auto;transform:translate(-50%,calc(var(--s3) * -1))}}
 
 /* 14 · ADMIN (classes usadas por js/admin.js) ---------------- */
 .adm{position:fixed;inset:0;z-index:60;width:100vw;overflow-y:auto;overscroll-behavior:contain;background:var(--bg);outline:none;animation:fd var(--t2) var(--e)}

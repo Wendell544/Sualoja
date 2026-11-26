@@ -2,6 +2,7 @@
    config.js — constantes, utilitários globais, ícones e Supabase.
    Carrega primeiro: storage, images, auth, shop, admin e app usam isto.
    ============================================================= */
+const CFG_V = 20; // versão dos arquivos: o index.html confere se style.css, config.js, shop.js e app.js batem
 const V = 12, PFX = 'loja_', KEY = {
   prod: PFX + 'products',
   cart: PFX + 'cart',
@@ -32,8 +33,7 @@ const CATS0 = ['Novidades', 'Promoções', 'Destaques', 'Mais Vendidos', 'Exclus
 
 /* Padrões da loja. Qualquer chave salva em settings.data (Supabase) tem prioridade. */
 const SET0 = {
-  name: 'Sua Loja', // logo tipográfico, rodapé, título da aba e mensagem do pedido
-  logo: null, // opcional: { light: 'https://…', dark: 'https://…' } troca o logo tipográfico por imagem
+  name: 'Sua Loja', // título da aba, rodapé e mensagem do pedido (a logo fica em --logo-* no style.css)
   kick: 'Qualidade que você sente',
   title: 'O melhor para você está aqui',
   text: 'Selecionamos produtos de qualidade para o seu dia a dia. Escolha o que ama e finalize no WhatsApp.',
@@ -69,7 +69,8 @@ const debounce = (fn, ms = 300) => {
 /* Rolagem suave só para quem não pediu movimento reduzido. */
 const smooth = () => (matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth');
 
-/* Toast: a região aria-live (#ts) nunca sai do DOM; só a visibilidade muda.
+/* Toast: some sozinho em 2,8s e nunca bloqueia cliques (pointer-events:none).
+   A região aria-live (#ts) nunca sai do DOM; só a visibilidade muda.
    k = 'ok' | 'er'. Sem k, o tipo é deduzido do texto (mensagens do admin). */
 const toast = (t, k) => {
   const e = $('ts');
@@ -82,7 +83,7 @@ const toast = (t, k) => {
   toast.t = setTimeout(() => {
     e.classList.remove('on');
     toast.t = setTimeout(() => (e.textContent = ''), 400);
-  }, 3200);
+  }, 2800);
 };
 
 /* Overlays: trava a rolagem, deixa o fundo inerte (foco fica no diálogo)
@@ -181,5 +182,43 @@ const seed = () => [
   created_at: new Date().toISOString()
 }));
 
-/* Se o CDN do supabase-js falhar, SB fica null e a loja mostra o estado de erro (com "Tentar novamente"). */
-const SB = window.supabase ? supabase.createClient(SB_URL, SB_KEY) : null;
+/* Sessão do admin (Supabase Auth) salva no navegador.
+   Renovar uma sessão vencida cujo token foi revogado (ex.: "Sair" em outro aparelho encerra todas as sessões)
+   gera no console: 400 + "AuthApiError: Invalid Refresh Token: Refresh Token Not Found" (_recoverAndRefresh).
+   Por isso a vitrine NUNCA renova sessão: fora do painel (A.ok falso), uma sessão vencida simplesmente não é lida
+   (fica guardada, sem chamar o servidor) e o admin faz login de novo ao abrir o painel.
+   Com o painel aberto (A.ok), a sessão é lida normalmente e o supabase-js renova o token quando precisa. */
+const SB_SK = 'sb-' + new URL(SB_URL).hostname.split('.')[0] + '-auth-token'; // mesma chave padrão do supabase-js
+const sbOld = (v) => {
+  try {
+    const x = JSON.parse(v), e = x && x.expires_at;
+    return !!e && e * 1000 - Date.now() < 9e4; // vencida ou vencendo em 90s (mesma margem do supabase-js)
+  } catch (e) {
+    return false;
+  }
+};
+const SBS = {
+  getItem: (k) => {
+    try {
+      const v = localStorage.getItem(k);
+      return v && k === SB_SK && !(typeof A !== 'undefined' && A.ok) && sbOld(v) ? null : v;
+    } catch (e) {
+      return null;
+    }
+  },
+  setItem: (k, v) => {
+    try {
+      localStorage.setItem(k, v);
+    } catch (e) {}
+  },
+  removeItem: (k) => {
+    try {
+      localStorage.removeItem(k);
+    } catch (e) {}
+  }
+};
+
+/* Se o CDN do supabase-js falhar, SB fica null e a loja mostra o estado de erro (com "Tentar novamente").
+   autoRefreshToken:false = nada de renovação em segundo plano ou ao abrir a página (só sob demanda, no painel).
+   detectSessionInUrl:false = a loja não usa link mágico/OAuth (o #p=123 dos produtos nunca é lido como sessão). */
+const SB = window.supabase ? supabase.createClient(SB_URL, SB_KEY, { auth: { storage: SBS, storageKey: SB_SK, autoRefreshToken: false, detectSessionInUrl: false } }) : null;
