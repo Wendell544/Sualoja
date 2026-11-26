@@ -43,7 +43,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;1,500&display=swap">
-<link rel="stylesheet" href="css/style.css?v=18">
+<link rel="stylesheet" href="css/style.css?v=19">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -71,14 +71,14 @@
 
 <header class="hd" id="hd">
   <div class="w hd-in">
-    <!-- Logo tipográfico (nome em SET0.name). Para usar imagem, preencha SET0.logo em js/config.js. -->
+    <!-- Slot da logo (não remover): texto ou imagem via --logo-text / --logo-src no topo de css/style.css. -->
     <a href="#top" class="logo" id="logo" aria-label="Sua Loja — página inicial"><span>Sua Loja</span></a>
     <div class="hs" id="hs" role="search">
       <i data-i="search" data-s="18"></i>
       <input id="qh" class="in qi" type="search" placeholder="Buscar produtos" aria-label="Buscar produtos" autocomplete="off" enterkeyhint="search">
     </div>
     <div class="hd-a">
-      <button class="q hd-s" data-a="srch" aria-label="Abrir busca" aria-controls="hs" aria-expanded="false"><i data-i="search"></i></button>
+      <button class="q hd-s" data-a="srch" aria-label="Buscar produtos" aria-controls="qm"><i data-i="search"></i></button>
       <button class="q" data-a="theme" aria-label="Alternar tema claro ou escuro"><i class="i-dk" data-i="moon"></i><i class="i-lt" data-i="sun"></i></button>
       <button class="q bg" data-a="favs" aria-label="Ver favoritos"><i data-i="heart"></i><span id="wb" class="bd hid" aria-hidden="true">0</span></button>
       <button class="q bg" data-a="cart" aria-label="Abrir sacola" aria-controls="drw" aria-expanded="false"><i data-i="bag"></i><span id="bd" class="bd gold hid" aria-hidden="true">0</span></button>
@@ -130,7 +130,7 @@
         </select>
       </div>
     </div>
-    <div id="fc" class="chips fc" role="group" aria-label="Filtrar produtos" data-dyn></div>
+    <div class="fcw"><div id="fc" class="chips fc" role="group" aria-label="Filtrar produtos" data-dyn></div></div>
     <div id="grid" class="gr">
       <div class="cd ske" aria-hidden="true"><div class="cd-i sk"></div><i class="sk sk-l"></i><i class="sk sk-l s"></i><i class="sk sk-l xs"></i></div>
       <div class="cd ske" aria-hidden="true"><div class="cd-i sk"></div><i class="sk sk-l"></i><i class="sk sk-l s"></i><i class="sk sk-l xs"></i></div>
@@ -190,12 +190,12 @@
 <div id="ts" class="ts" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js" defer></script>
-<script src="js/config.js?v=18" defer></script>
-<script src="js/storage.js?v=18" defer></script>
-<script src="js/images.js?v=18" defer></script>
-<script src="js/auth.js?v=18" defer></script>
-<script src="js/shop.js?v=18" defer></script>
-<script src="js/admin.js?v=18" defer></script>
-<script src="js/app.js?v=18" defer></script>
+<script src="js/config.js?v=19" defer></script>
+<script src="js/storage.js?v=19" defer></script>
+<script src="js/images.js?v=19" defer></script>
+<script src="js/auth.js?v=19" defer></script>
+<script src="js/shop.js?v=19" defer></script>
+<script src="js/admin.js?v=19" defer></script>
+<script src="js/app.js?v=19" defer></script>
 </body>
 </html>

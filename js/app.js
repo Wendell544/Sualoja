@@ -130,15 +130,29 @@ addEventListener('hashchange', () => {
   }
 });
 
-/* Header com borda após rolar + botão "voltar ao topo" após 400px (1 leitura por frame). */
-let sq = 0;
+/* Só o header é sticky. O "voltar ao topo" (fixed) aparece após 400px e some no topo,
+   enquanto se digita (teclado aberto) e quando o rodapé está visível — nunca cobre o rodapé. */
+let sq = 0, ftv = false;
+const typing = () => {
+  const a = document.activeElement;
+  return !!a && (a.tagName === 'TEXTAREA' || (a.tagName === 'INPUT' && /^(text|search|email|tel|number|password|url)$/.test(a.type)));
+};
 const onS = () => {
   sq = 0;
   const y = scrollY;
   $('hd').classList.toggle('sc', y > 8);
-  $('tt').classList.toggle('on', y > 400);
+  $('tt').classList.toggle('on', y > 400 && !ftv && !typing());
 };
-addEventListener('scroll', () => sq || (sq = requestAnimationFrame(onS)), { passive: true });
+const reS = () => sq || (sq = requestAnimationFrame(onS));
+addEventListener('scroll', reS, { passive: true });
+document.addEventListener('focusin', reS);
+document.addEventListener('focusout', () => setTimeout(reS));
+try {
+  new IntersectionObserver(([e]) => {
+    ftv = e.isIntersecting;
+    reS();
+  }).observe($('ft'));
+} catch (e) {}
 addEventListener('resize', debounce(() => railUI(), 150));
 
 const pf = Prefs.get();
@@ -152,6 +166,7 @@ try {
   });
 } catch (e) {}
 document.querySelectorAll('[data-i]').forEach((e) => (e.innerHTML = ic(e.dataset.i, +e.dataset.s || 20)));
+logoUI(); // aplica --logo-src / --logo-text antes dos dados chegarem
 onS();
 
 // Failsafe: se por algum motivo o boot não terminar em 6s, libera a página.

@@ -32,8 +32,7 @@ const CATS0 = ['Novidades', 'Promoções', 'Destaques', 'Mais Vendidos', 'Exclus
 
 /* Padrões da loja. Qualquer chave salva em settings.data (Supabase) tem prioridade. */
 const SET0 = {
-  name: 'Sua Loja', // logo tipográfico, rodapé, título da aba e mensagem do pedido
-  logo: null, // opcional: { light: 'https://…', dark: 'https://…' } troca o logo tipográfico por imagem
+  name: 'Sua Loja', // título da aba, rodapé e mensagem do pedido (a logo fica em --logo-* no style.css)
   kick: 'Qualidade que você sente',
   title: 'O melhor para você está aqui',
   text: 'Selecionamos produtos de qualidade para o seu dia a dia. Escolha o que ama e finalize no WhatsApp.',
@@ -69,7 +68,8 @@ const debounce = (fn, ms = 300) => {
 /* Rolagem suave só para quem não pediu movimento reduzido. */
 const smooth = () => (matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth');
 
-/* Toast: a região aria-live (#ts) nunca sai do DOM; só a visibilidade muda.
+/* Toast: some sozinho em 2,8s e nunca bloqueia cliques (pointer-events:none).
+   A região aria-live (#ts) nunca sai do DOM; só a visibilidade muda.
    k = 'ok' | 'er'. Sem k, o tipo é deduzido do texto (mensagens do admin). */
 const toast = (t, k) => {
   const e = $('ts');
@@ -82,7 +82,7 @@ const toast = (t, k) => {
   toast.t = setTimeout(() => {
     e.classList.remove('on');
     toast.t = setTimeout(() => (e.textContent = ''), 400);
-  }, 3200);
+  }, 2800);
 };
 
 /* Overlays: trava a rolagem, deixa o fundo inerte (foco fica no diálogo)
