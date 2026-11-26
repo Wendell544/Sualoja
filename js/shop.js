@@ -3,6 +3,7 @@
    API pública preservada: render, hero, rails, grid, card, adCard, drawP,
    cartUI, footer, openFromHash e ACT.* (admin/login/exit vivem no admin.js).
    ============================================================= */
+const SHOP_V = 20; // precisa bater com data-v do index.html (veja o aviso no console)
 const S = { cat: 'Todos', q: '', srt: 'feat', n: 0, err: 0 }, PM = { p: null, i: 0, z: false, h: 0 };
 let swp = 0;
 const FAV = '__fav';
@@ -260,12 +261,15 @@ const related = (p) => {
   return [...ok.filter((x) => x.category === p.category).sort(f), ...ok.filter((x) => x.category !== p.category).sort(f)].slice(0, 8);
 };
 
+/* PC: .pm-s em 2 colunas — .pm-img (fotos, parada) | .pm-r (informações + relacionados, rola sozinha).
+   Celular: tudo numa coluna rolável, com a barra .pm-bar fixa embaixo. */
 function drawP() {
   const p = PM.p, v = pr(p), off = v < p.price, un = p.available === false, i = inst(p), rel = related(p), wl = esc(waP(p)), b = $('pmb');
   const add = (l) => `<button class="b gold" data-a="add" data-v="${p.id}"${un ? ' disabled' : ''}>${ic('bag', 18)}${un ? 'Esgotado' : l}</button>`;
   b.innerHTML = `<button class="q pm-x" data-a="close" aria-label="Fechar">${ic('x', 18)}</button>
 <div class="pm-s">
 <div class="pm-img">${gal(p)}</div>
+<div class="pm-r">
 <div class="pm-info">
 <div class="pm-top"><p class="kick tg">${esc(p.category)}</p><div class="pm-tools">${favB(p, ' q')}<button class="q" data-a="share" data-v="${p.id}" aria-label="Compartilhar produto">${ic('share', 18)}</button></div></div>
 <h2 class="pm-title" id="pm-t">${esc(p.title)}</h2>
@@ -275,6 +279,7 @@ ${p.description ? `<p class="pm-desc">${esc(p.description)}</p>` : ''}${un ? `<p
 <p class="pm-note">${ic('wa', 14)}Pedido finalizado pelo WhatsApp, direto com a loja.</p>
 </div>
 ${rel.length ? `<section class="rel" aria-labelledby="rel-t"><h3 class="serif h3" id="rel-t">Você também pode gostar</h3><div class="rl-w"><div class="rl">${rel.map((x) => card(x, 'h4')).join('')}</div></div></section>` : ''}
+</div>
 <div class="pm-bar"><div class="pm-bp"><b>${money(v)}</b>${off ? `<s>${money(p.price)}</s>` : ''}</div>${add('Adicionar')}<a class="q" target="_blank" rel="noopener" href="${wl}" aria-label="Pedir pelo WhatsApp">${ic('wa')}</a></div>
 </div>`;
   IMG.hydrate(b);

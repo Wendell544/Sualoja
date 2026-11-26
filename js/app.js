@@ -3,6 +3,7 @@
    Também atende o admin.js: busca (fq), rascunho (pf-*), msearch,
    uploads (pf-file / mf-file / sf-file) e Ctrl+S.
    ============================================================= */
+const APP_V = 20; // precisa bater com data-v do index.html (veja o aviso no console)
 let pd = null;
 document.addEventListener('click', (e) => {
   const t = e.target.closest('[data-a]');
@@ -91,6 +92,13 @@ document.addEventListener('pointermove', (e) => {
   });
 }, { passive: true });
 
+/* PC: a coluna das fotos do modal é fixa; a rodinha do mouse sobre ela rola a coluna de informações. */
+document.addEventListener('wheel', (e) => {
+  const g = !PM.z && e.target.closest && e.target.closest('.pm-img'), r = g && g.parentNode.querySelector('.pm-r');
+  if (!r || r.scrollHeight <= r.clientHeight || getComputedStyle(r).overflowY !== 'auto') return;
+  r.scrollTop += e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? r.clientHeight : 1);
+}, { passive: true });
+
 /* Busca em tempo real (header + coleção sincronizados) */
 let qt;
 const onQ = (e) => {
@@ -166,7 +174,7 @@ try {
   });
 } catch (e) {}
 document.querySelectorAll('[data-i]').forEach((e) => (e.innerHTML = ic(e.dataset.i, +e.dataset.s || 20)));
-logoUI(); // aplica --logo-src / --logo-text antes dos dados chegarem
+if (typeof logoUI === 'function') logoUI(); // aplica --logo-src / --logo-text antes dos dados chegarem (shop.js antigo não tem)
 onS();
 
 // Failsafe: se por algum motivo o boot não terminar em 6s, libera a página.
@@ -197,9 +205,11 @@ setTimeout(() => document.documentElement.classList.remove('is-loading'), 6000);
     document.documentElement.classList.remove('is-loading');
   }
   setTimeout(openFromHash, 60);
+  // Admin já logado? Lê a sessão salva sem chamar o servidor (sessão vencida volta null: veja SBS em config.js).
+  // Assim a vitrine nunca dispara a renovação do token, que dava 400 "Invalid Refresh Token" no console.
   try {
-    const session = await Auth.getSession();
-    if (session && session.user?.app_metadata?.role === 'admin') A.ok = true;
+    const s = JSON.parse(SBS.getItem(SB_SK) || 'null');
+    if (s && s.user?.app_metadata?.role === 'admin') A.ok = true;
     await IMG.migrateLegacy();
   } catch (e) {}
 })();

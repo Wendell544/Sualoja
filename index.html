@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="is-loading">
+<html lang="pt-BR" class="is-loading" data-v="20">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -36,6 +36,8 @@
     d.setAttribute('data-theme', t);
     var c = t === 'dark' ? '#12100e' : '#f6f2eb', m = document.querySelectorAll('meta[name="theme-color"]');
     for (var i = 0; i < m.length; i++) m[i].setAttribute('content', c);
+    // Trava de segurança: mesmo se algum JS falhar, a página nunca fica escondida mais de 6s.
+    setTimeout(function () { d.classList.remove('is-loading'); }, 6000);
   } catch (e) {}
 })();
 </script>
@@ -43,7 +45,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;1,500&display=swap">
-<link rel="stylesheet" href="css/style.css?v=19">
+<link rel="stylesheet" href="css/style.css?v=20">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -122,7 +124,7 @@
       </div>
       <div class="tools">
         <div class="ms"><i data-i="search" data-s="18"></i><input id="qm" class="in qi" type="search" placeholder="Buscar produtos" aria-label="Buscar produtos" autocomplete="off" enterkeyhint="search"></div>
-        <select id="so" class="in so" aria-label="Ordenar por">
+        <select id="so" class="in srt" aria-label="Ordenar por">
           <option value="feat">Destaques</option>
           <option value="new">Mais recentes</option>
           <option value="lo">Menor preço</option>
@@ -190,12 +192,27 @@
 <div id="ts" class="ts" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js" defer></script>
-<script src="js/config.js?v=19" defer></script>
-<script src="js/storage.js?v=19" defer></script>
-<script src="js/images.js?v=19" defer></script>
-<script src="js/auth.js?v=19" defer></script>
-<script src="js/shop.js?v=19" defer></script>
-<script src="js/admin.js?v=19" defer></script>
-<script src="js/app.js?v=19" defer></script>
+<script src="js/config.js?v=20" defer></script>
+<script src="js/storage.js?v=20" defer></script>
+<script src="js/images.js?v=20" defer></script>
+<script src="js/auth.js?v=20" defer></script>
+<script src="js/shop.js?v=20" defer></script>
+<script src="js/admin.js?v=20" defer></script>
+<script src="js/app.js?v=20" defer></script>
+<!--
+  Confere a versão: index.html, style.css, config.js, shop.js e app.js precisam ser da MESMA versão.
+  O GitHub Pages ignora o ?v=, então um arquivo esquecido no upload quebra o layout. Se algum ficou para trás,
+  o console avisa qual é. Ao atualizar, envie os 5 arquivos juntos.
+-->
+<script>
+addEventListener('DOMContentLoaded', function () {
+  var v = document.documentElement.getAttribute('data-v'), r = [];
+  if (getComputedStyle(document.documentElement).getPropertyValue('--app-v').trim() !== v) r.push('css/style.css');
+  if (typeof CFG_V === 'undefined' || String(CFG_V) !== v) r.push('js/config.js');
+  if (typeof SHOP_V === 'undefined' || String(SHOP_V) !== v) r.push('js/shop.js');
+  if (typeof APP_V === 'undefined' || String(APP_V) !== v) r.push('js/app.js');
+  if (r.length) console.warn('[Sua Loja] Arquivo de outra versão no servidor: ' + r.join(', ') + ' (o index.html é v' + v + '). Envie os 5 arquivos juntos: index.html, css/style.css, js/config.js, js/shop.js e js/app.js.');
+});
+</script>
 </body>
 </html>
