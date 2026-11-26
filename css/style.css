@@ -19,7 +19,8 @@
 --app-v:20;
 --tap:44px;--gut:16px;--max:1280px;--hdh:64px;--sec:64px;
 /* 🔽 TROCA DE LOGO (o slot .logo nunca deve ser removido):
-   - Para usar imagem: --logo-src: url("img/logo.png");   (opcional: --logo-src-dark: url("img/logo-escura.png"); para o tema escuro)
+   - Para usar imagem: --logo-src: url("../img/logo.png");   (opcional: --logo-src-dark: url("../img/logo-escura.png"); para o tema escuro)
+     O caminho é relativo a ESTE arquivo (pasta css/): por isso o "../" antes de img/. Também aceita URL completa (https://…).
    - Para usar texto:  --logo-src: "";   e escreva o nome em --logo-text
    - --logo-h / --logo-w: caixa máxima da imagem. A proporção é respeitada (contain), então o layout não quebra. */
 --logo-src:"";--logo-text:"Sua Loja";--logo-h:40px;--logo-w:180px;
